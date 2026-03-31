@@ -40,7 +40,6 @@ body {
     border-color: green;
 }
 
-
 .form-group-signup textarea.invalid {
     border-color: red;
     background-color: #ffe0e0;

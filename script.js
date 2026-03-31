@@ -27,19 +27,6 @@ comment.addEventListener("blur", () => {
 })
 
 
-const getSavedUsername = () => {
-    if (typeof window !== "undefined") {
-        const savedUsername = localStorage.getItem(USERNAME_KEY)
-        return savedUsername || ""
-    }
-    return ""
-}
-
-// const setUsername = (newUsername) => {
-//     localStorage.setItem(USERNAME_KEY, newUsername)
-//     title.value = newUsername
-// }
-
 postForm.addEventListener("submit", (event) => {
 
     event.preventDefault()
@@ -84,9 +71,4 @@ postForm.addEventListener("submit", (event) => {
     }
     
 
-})
-
-document.addEventListener("DOMContentLoaded", () => {
-    //const savedUsername = getSavedUsername()
-   // setUsername(savedUsername)
 })
