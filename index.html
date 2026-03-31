@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="styles.css">
+  <title>The Document Object Model</title>
+</head>
+
+<body>
+  <div class="container-signup-form ">
+    <h1>Personal Blog</h1>
+    <form id="postForm" novalidate>
+      <div class="form-group-signup">
+        <label for="title">Title:</label>
+        <input type="text" id="title" name="title" required>
+        <span class="error-message" id="titleError"></span>
+      </div>
+      <div class="form-group-signup">
+        <label for="comment-box">Comment:</label>
+        <textarea id="comment-box" name="comment-box" rows="4" cols="50" placeholder="Type here..." minlength="8" maxlength="280" required></textarea>
+
+        <span class="error-message-signup" id="commentError"></span>
+      </div>
+
+
+      <button type="submit" class="signup-button">Register</button>
+    </form>
+  </div>
+
+   <ul id="comments"></ul>
+  <script src="script.js"></script>
+</body>
+
+</html>
