@@ -86,7 +86,7 @@ function renderPosts() {
     try {
         let postStr = localStorage.getItem("posts")
         posts = JSON.parse(postStr)
-        console.log("Local storage: ", postArr)
+        //console.log("Local storage: ", postArr)
 
     } catch (error) {
         console.log(error.validationMessage)
@@ -96,43 +96,75 @@ function renderPosts() {
 
         for (const post of posts) {
 
-            let postItemTitle = document.createElement("li")
-            postItemTitle.innerText = `Title: ${post.title}`
-            postItemTitle.style.listStyleType = "none"
-            postList.appendChild(postItemTitle)
+            const postItem = document.createElement("li")
+            postItem.innerText = `Title: ${post.title} \n Comment: ${post.comment} \n Time: ${post.timeStamp}`
+            postItem.style.listStyleType = "none"
+            //postList.appendChild(postItem)
 
-            let postItemComment = document.createElement("li")
-            postItemComment.innerText = `Comment: ${post.comment}`
-            postItemComment.style.listStyleType = "none";
-            postList.appendChild(postItemComment)
+            // let postItemComment = document.createElement("li")
+            // postItemComment.innerText = `Comment: ${post.comment}`
+            // postItemComment.style.listStyleType = "none";
+            // postList.appendChild(postItemComment)
 
-            let postItemTimeStamp = document.createElement("li")
-            postItemTimeStamp.innerText = `Time: ${post.timeStamp}`
-            postItemTimeStamp.toLocaleString('en-US')
-            postItemTimeStamp.style.listStyleType = "none"
-            postList.appendChild(postItemTimeStamp)
+            // let postItemTimeStamp = document.createElement("li")
+            // postItemTimeStamp.innerText = `Time: ${post.timeStamp}`
+            // postItemTimeStamp.toLocaleString('en-US')
+            // postItemTimeStamp.style.listStyleType = "none"
+            // postList.appendChild(postItemTimeStamp)
 
             let editPostBtn = document.createElement("button")
             editPostBtn.textContent = "Edit"
             editPostBtn.style.marginRight = "20px"
-            editPostBtn.style.marginTop = "10px"
-            postList.appendChild(editPostBtn)
+            editPostBtn.style.marginLeft = "20px"
+            editPostBtn.addEventListener("click", () => editPost(postItem))
+            //postList.appendChild(editPostBtn)
+            postItem.appendChild(editPostBtn)
 
             let deletePostBtn = document.createElement("button")
             deletePostBtn.textContent = "Delete"
-            postList.appendChild(deletePostBtn)
+            deletePostBtn.addEventListener("click", () => deletePost(postItem, post.id))
+            //postList.appendChild(deletePostBtn)
+            postItem.appendChild(deletePostBtn)
 
             let postItemSeparator = document.createElement("span")
             postItemSeparator.innerText = "\n-------------------------------------------"
-            postList.appendChild(postItemSeparator)
+            //postList.appendChild(postItemSeparator)
+            postItem.appendChild(postItemSeparator)
+
+            postList.appendChild(postItem)
 
         }
     }
 
 }
 
+function deletePost(li, id) {
+    li.remove()
+    console.log(li)
+    const newPostList = posts.filter(post => post.id !== id)
+    posts = newPostList
+
+    try {
+        const storedPostStr = localStorage.getItem("posts")
+        const storedPost = JSON.parse(storedPostStr)
+        console.log("Local storage: ", storedPostStr)
+
+        if (storedPost !== null) {
+            const updatedPostList = storedPost.filter(post => post.id !== id)
+            localStorage.setItem("posts", JSON.stringify(updatedPostList))
+        }
+
+    } catch (error) {
+        console.log(error.validationMessage)
+    }
+
+
+
+
+}
+
 document.addEventListener("DOMContentLoaded", () => {
 
-   renderPosts()
+    renderPosts()
 
 })
