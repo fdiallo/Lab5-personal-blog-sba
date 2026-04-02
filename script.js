@@ -3,12 +3,14 @@ let title = document.getElementById("title")
 let titleError = document.getElementById("titleError")
 let comment = document.getElementById("comment-box")
 let commentError = document.getElementById("commentError")
+let submitBtn = document.getElementById("submitBtn")
 
 let postList = document.getElementById("postList")
 
 let posts = []
 let id = 0
 let date = new Date()
+let currentEditingId = null
 
 title.addEventListener("blur", (event) => {
     if (title.value == "") {
@@ -28,18 +30,12 @@ comment.addEventListener("blur", () => {
     commentError.innerText = comment.validationMessage
 })
 
-
-const getSavedUsername = () => {
-    if (typeof window !== "undefined") {
-        const savedUsername = localStorage.getItem(USERNAME_KEY)
-        return savedUsername || ""
-    }
-    return ""
-}
-
-// const setUsername = (newUsername) => {
-//     localStorage.setItem(USERNAME_KEY, newUsername)
-//     title.value = newUsername
+// const getSavedUsername = () => {
+//     if (typeof window !== "undefined") {
+//         const savedUsername = localStorage.getItem(USERNAME_KEY)
+//         return savedUsername || ""
+//     }
+//     return ""
 // }
 
 postForm.addEventListener("submit", (event) => {
@@ -61,8 +57,10 @@ postForm.addEventListener("submit", (event) => {
     const titleValue = formData.get("title")
     const commentValue = formData.get("comment-box")
 
+    let counter = posts.length
+
     let postData = {
-        id: ++id,
+        id: counter,
         title: titleValue,
         comment: commentValue,
         timeStamp: new Date().toLocaleString('en-US')
@@ -83,64 +81,83 @@ function renderPosts() {
     postList.innerHTML = ""
     posts = []
 
-    try {
-        let postStr = localStorage.getItem("posts")
-        posts = JSON.parse(postStr)
-        //console.log("Local storage: ", postArr)
+    posts = getPostFromStorage()
 
-    } catch (error) {
-        console.log(error.validationMessage)
-    }
-
-    if (posts !== null) {
+    if (posts && posts.length) {
 
         for (const post of posts) {
 
             const postItem = document.createElement("li")
             postItem.innerText = `Title: ${post.title} \n Comment: ${post.comment} \n Time: ${post.timeStamp}`
             postItem.style.listStyleType = "none"
-            //postList.appendChild(postItem)
-
-            // let postItemComment = document.createElement("li")
-            // postItemComment.innerText = `Comment: ${post.comment}`
-            // postItemComment.style.listStyleType = "none";
-            // postList.appendChild(postItemComment)
-
-            // let postItemTimeStamp = document.createElement("li")
-            // postItemTimeStamp.innerText = `Time: ${post.timeStamp}`
-            // postItemTimeStamp.toLocaleString('en-US')
-            // postItemTimeStamp.style.listStyleType = "none"
-            // postList.appendChild(postItemTimeStamp)
 
             let editPostBtn = document.createElement("button")
             editPostBtn.textContent = "Edit"
             editPostBtn.style.marginRight = "20px"
             editPostBtn.style.marginLeft = "20px"
-            editPostBtn.addEventListener("click", () => editPost(postItem))
-            //postList.appendChild(editPostBtn)
+            editPostBtn.addEventListener("click", () => editPost(post.id))
             postItem.appendChild(editPostBtn)
 
             let deletePostBtn = document.createElement("button")
             deletePostBtn.textContent = "Delete"
             deletePostBtn.addEventListener("click", () => deletePost(postItem, post.id))
-            //postList.appendChild(deletePostBtn)
             postItem.appendChild(deletePostBtn)
 
             let postItemSeparator = document.createElement("span")
-            postItemSeparator.innerText = "\n-------------------------------------------"
-            //postList.appendChild(postItemSeparator)
+            postItemSeparator.innerText = "\n---------------------------------------------------------------"
             postItem.appendChild(postItemSeparator)
 
             postList.appendChild(postItem)
-
         }
     }
 
 }
 
+function editPost(id) {
+    currentEditingId = id
+    const postToEdit = posts.find(post => post.id === id)
+
+    console.log(postToEdit)
+    document.getElementById("editTitle").value = postToEdit.title
+    document.getElementById("editComment").value = postToEdit.comment
+
+    document.getElementById("updateModal").showModal()
+
+}
+
+document.getElementById("saveChangesBtn").addEventListener("click", () => {
+    const editTitle = document.getElementById("editTitle").value
+    const editComment = document.getElementById("editComment").value
+
+    const index = posts.findIndex(post => post.id === currentEditingId)
+    if (index !== -1) {
+        posts[index].title = editTitle
+        posts[index].comment = editComment
+    }
+
+    localStorage.setItem("posts", JSON.stringify(posts))
+    renderPosts()
+    closeModal()
+    postForm.reset()
+    console.log("Updated posts: " + posts)
+})
+const dialog = document.getElementById("updateModal")
+dialog.addEventListener("click", (event) => {
+    if (event.target === dialog) {
+        dialog.close()
+    }
+})
+
+document.getElementById("closeBtn").addEventListener("click", (event) => {
+    closeModal()
+})
+
+function closeModal() {
+    document.getElementById("updateModal").close()
+}
+
 function deletePost(li, id) {
     li.remove()
-    console.log(li)
     const newPostList = posts.filter(post => post.id !== id)
     posts = newPostList
 
@@ -153,18 +170,22 @@ function deletePost(li, id) {
             const updatedPostList = storedPost.filter(post => post.id !== id)
             localStorage.setItem("posts", JSON.stringify(updatedPostList))
         }
-
     } catch (error) {
         console.log(error.validationMessage)
     }
+}
 
-
-
-
+function getPostFromStorage() {
+    let storagePosts = []
+    try {
+        let postStr = localStorage.getItem("posts")
+        storagePosts = JSON.parse(postStr)
+    } catch (error) {
+        console.log(error.validationMessage)
+    }
+    return storagePosts
 }
 
 document.addEventListener("DOMContentLoaded", () => {
-
     renderPosts()
-
 })
